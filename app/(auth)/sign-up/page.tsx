@@ -7,7 +7,11 @@ import SelectField from "@/components/forms/selectField";
 import { INVESTMENT_GOALS, PREFERRED_INDUSTRIES, RISK_TOLERANCE_OPTIONS } from "@/lib/constants";
 import { CountrySelectField } from "@/components/forms/countryField";
 import FooterLink from "@/components/forms/footerLink";
+import { signUpWithEmail } from "@/lib/actions/authactions";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 const SignUp = () => {
+    const router = useRouter();
     const {
         register,
         handleSubmit,
@@ -27,10 +31,14 @@ const SignUp = () => {
     });
     const onSubmit =  async (data: SignUpFormData) => {
         try {
-            console.log(data);
+            const result = await  signUpWithEmail(data);
+            if(result.success)router.push('/');
             
         }catch(e) {
             console.log(e);
+            toast.error(`Sign Up failed`, {
+                description: e instanceof Error ? e.message : 'failed to create an account'
+            })
         }
     }
     return (
@@ -51,7 +59,7 @@ const SignUp = () => {
                     placeholder="xyz@gmail.com"
                     register={register}
                     error={errors.email}
-                    validation={{ required: "Proper email is required", pattern: /^\w+@\w\.\w+$/, message: 'Email is needed'}}
+                    validation={{ required: "Proper email is required", pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Email is needed'}}
                 />
                 <InputField 
                     name="password"
